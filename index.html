@@ -1,0 +1,758 @@
+<!DOCTYPE html>
+<html lang="ko" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>WHAT'S IN MY TRUNK? — Pleos Vehicle Context Intelligence</title>
+  <meta
+    name="description"
+    content="출발지에서 목적지까지, 사람과 물건의 이동을 정확히 인지하고 돕는 현대자동차그룹 Pleos Connect 차량 네이티브 컨텍스트 인텔리전스"
+  />
+  <link rel="icon" type="image/png" href="assets/app_icon_final_m3_transparent.png" />
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css"
+    rel="stylesheet"
+  />
+  <link
+    href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Space+Grotesk:wght@500;600;700&display=swap"
+    rel="stylesheet"
+  />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <!-- Ambient Background Glow -->
+  <div class="ambient-bg" aria-hidden="true">
+    <div class="ambient-orb orb-1"></div>
+    <div class="ambient-orb orb-2"></div>
+    <div class="ambient-grid"></div>
+  </div>
+
+  <!-- Initial Route Header (scrolls naturally out of viewport) -->
+  <header class="site-header" id="top">
+    <div class="container nav-inner">
+      <a href="#top" class="brand">
+        <img
+          src="assets/app_icon_final_m3_transparent.png"
+          alt="What's in My Trunk 공식 로고 M-3"
+          class="brand-logo"
+        />
+        <div class="brand-text">
+          <span class="brand-title">WHAT'S IN MY TRUNK?</span>
+          <span class="brand-sub">Origin to Destination Care</span>
+        </div>
+      </a>
+
+      <!-- Route Waypoints Navigation (Secret Plan intentionally omitted) -->
+      <nav class="route-nav" aria-label="주행 여정 내비게이션">
+        <div class="route-track" aria-hidden="true">
+          <div class="route-track-fill" id="routeTrackFill"></div>
+        </div>
+        <a href="#top" class="route-stop active" data-section="top">
+          <span class="stop-beacon"></span>
+          <span class="stop-tag">출발지</span>
+          <span class="stop-name">콕핏 체험</span>
+        </a>
+        <a href="#transport-core" class="route-stop" data-section="transport-core">
+          <span class="stop-beacon"></span>
+          <span class="stop-tag">적재 인지</span>
+          <span class="stop-name">출발·도착 관리</span>
+        </a>
+        <a href="#architecture" class="route-stop" data-section="architecture">
+          <span class="stop-beacon"></span>
+          <span class="stop-tag">맥락 엔진</span>
+          <span class="stop-name">4-Layer 흐름</span>
+        </a>
+        <a href="#download" class="route-stop" data-section="download">
+          <span class="stop-beacon"></span>
+          <span class="stop-tag">목적지</span>
+          <span class="stop-name">하차·다운로드</span>
+        </a>
+      </nav>
+
+      <div class="nav-actions">
+        <button
+          id="themeToggle"
+          class="theme-toggle"
+          type="button"
+          aria-label="Pleos 주간/야간 HMI 테마 전환"
+          title="주간(Light) / 야간(Dark) Pleos HMI 테마 전환"
+        >
+          <span class="theme-icon" id="themeIcon">🌙</span>
+          <span class="theme-label" id="themeLabel">Night</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Progressive Gradient Blur Scrim (separated from capsule for clean mask compositing) -->
+  <div class="top-blur-scrim" aria-hidden="true"></div>
+
+  <!-- Floating Journey Capsule (Expandable Route Popover temporarily disabled) -->
+  <div class="route-capsule-dock" id="routeCapsuleDock">
+    <button
+      type="button"
+      class="route-capsule"
+      id="routeCapsuleBtn"
+      data-phase="origin"
+      aria-label="현재 주행 여정 지점"
+    >
+      <span class="capsule-beacon" aria-hidden="true"></span>
+      <span class="capsule-label-stage" id="capsuleLabelStage">
+        <span class="capsule-label-slot" id="capsuleLabelSlot">
+          <span class="capsule-tag" id="capsuleTag">출발지</span>
+          <span class="capsule-sep" aria-hidden="true">·</span>
+          <span class="capsule-name" id="capsuleName">콕핏 체험</span>
+        </span>
+      </span>
+      <span class="capsule-pct" id="capsulePct">0%</span>
+      <!-- [비활성화] 캡슐 클릭 안내 화살표
+      <span class="capsule-chevron" aria-hidden="true">▾</span>
+      -->
+    </button>
+
+    <!-- [비활성화] 캡슐 클릭 시 열리는 전체 주행 여정 안내 팝오버 (스크롤 인터랙션 충돌 방지용 주석 처리)
+    <nav class="route-popover" id="routePopover" aria-label="전체 주행 여정 경로" hidden>
+      <div class="popover-head">
+        <span class="popover-label">ORIGIN TO DESTINATION</span>
+        <span class="popover-progress" id="popoverProgress">0% 이동 중</span>
+      </div>
+      <div class="popover-list">
+        <a href="#top" class="popover-stop active" data-index="0">
+          <span class="popover-beacon"></span>
+          <span class="popover-stop-tag">출발지</span>
+          <span class="popover-stop-name">콕핏 체험</span>
+          <span class="popover-stop-state">현재 지점</span>
+        </a>
+        <a href="#transport-core" class="popover-stop" data-index="1">
+          <span class="popover-beacon"></span>
+          <span class="popover-stop-tag">적재 인지</span>
+          <span class="popover-stop-name">출발·도착 관리</span>
+          <span class="popover-stop-state"></span>
+        </a>
+        <a href="#architecture" class="popover-stop" data-index="2">
+          <span class="popover-beacon"></span>
+          <span class="popover-stop-tag">맥락 엔진</span>
+          <span class="popover-stop-name">4-Layer 흐름</span>
+          <span class="popover-stop-state"></span>
+        </a>
+        <a href="#download" class="popover-stop" data-index="3">
+          <span class="popover-beacon"></span>
+          <span class="popover-stop-tag">목적지</span>
+          <span class="popover-stop-name">하차·다운로드</span>
+          <span class="popover-stop-state"></span>
+        </a>
+      </div>
+    </nav>
+    -->
+  </div>
+
+  <main>
+    <!-- 1. ORIGIN: Hero + Interactive Cockpit Mockup -->
+    <section class="hero section" id="hero-origin">
+      <div class="container hero-layout">
+        <div class="hero-copy">
+          <div class="contest-pill">
+            <span class="pulse-dot"></span>
+            <span>ORIGIN TO DESTINATION · PLEOS CONTEXT APP</span>
+          </div>
+
+          <h1 class="hero-title">
+            사람과 물건의 이동,<br />
+            <span class="text-gradient">출발에서 하차까지</span><br />
+            차량이 먼저 기억합니다.
+          </h1>
+
+          <p class="hero-desc">
+            자동차의 본질은 사용자와 소중한 물건을 출발지에서 목적지까지 안전하게 운송하는 것입니다.
+            <strong>WHAT'S IN MY TRUNK?</strong>는 운전자의 별도 입력 없이도 트렁크·도어·기어·내비게이션 맥락을
+            읽어내어, 이동의 시작과 끝을 정확히 인지하고 적재물과 차량 상태를 돕는 기초 컨텍스트 서비스입니다.
+          </p>
+
+          <div class="hero-cta">
+            <a href="#transport-core" class="btn btn-primary btn-lg">
+              출발·도착 인지 원리 보기 ↓
+            </a>
+            <a href="#architecture" class="btn btn-secondary btn-lg">
+              4-Layer 작동 구조 보기
+            </a>
+          </div>
+
+          <div class="hero-metrics">
+            <div class="metric-item">
+              <span class="metric-val">Origin</span>
+              <span class="metric-lbl">출발지 적재 자동 감지</span>
+            </div>
+            <div class="metric-divider"></div>
+            <div class="metric-item">
+              <span class="metric-val">Transit</span>
+              <span class="metric-lbl">경유지 필터 · 온도 보호</span>
+            </div>
+            <div class="metric-divider"></div>
+            <div class="metric-item">
+              <span class="metric-val">Arrival</span>
+              <span class="metric-lbl">최종 목적지 P단 하차 케어</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Live Interactive Mini Cockpit Preview + Explicit Difference Notice -->
+        <div class="hero-cockpit-wrap">
+          <div class="cockpit-bezel">
+            <div class="cockpit-topbar">
+              <div class="cockpit-brand-mini">
+                <img src="assets/app_icon_final_m3_transparent.png" alt="" class="mini-icon" />
+                <div>
+                  <div class="mini-title">WHAT'S IN MY TRUNK?</div>
+                  <div class="mini-sub">Web Interactive Preview</div>
+                </div>
+              </div>
+              <div class="cockpit-status-pills">
+                <span class="status-pill pill-green">
+                  <span class="dot"></span> VHAL Sync
+                </span>
+                <span class="status-pill pill-gear" id="heroGearPill">GEAR P</span>
+                <span class="status-pill pill-temp" id="heroTempPill">22.0℃</span>
+              </div>
+            </div>
+
+            <div class="cockpit-body">
+              <aside class="cockpit-rail" aria-hidden="true">
+                <div class="rail-btn active" title="대시보드">🚗</div>
+                <div class="rail-btn" title="보관함">📦</div>
+                <div class="rail-btn" title="신선 케어">❄️</div>
+                <div class="rail-btn" title="타임라인">🕒</div>
+              </aside>
+
+              <div class="cockpit-stage">
+                <div class="stage-header-row">
+                  <div class="tailgate-badge" id="heroTailgateBadge">
+                    <span class="door-dot"></span>
+                    <span id="heroTailgateText">테일게이트 닫힘 (안전)</span>
+                  </div>
+                  <span class="cargo-counter" id="heroCargoCounter">적재 화물 2건 보관 중</span>
+                </div>
+
+                <div class="stage-cards" id="heroCargoCards">
+                  <!-- Populated by JS -->
+                </div>
+
+                <div class="floating-deck" id="heroFloatingDeck">
+                  <div class="deck-alert-box" id="heroAlertBox">
+                    <div class="deck-alert-copy">
+                      <span class="alert-badge" id="heroAlertBadge">목적지 도착 · P단 하차 안내</span>
+                      <strong id="heroAlertTitle">트렁크에 신선식품 외 1건이 보관되어 있습니다.</strong>
+                    </div>
+                    <div class="deck-alert-actions">
+                      <button type="button" class="cockpit-btn cockpit-btn-primary" id="heroOpenTrunkBtn">
+                        트렁크 열기
+                      </button>
+                      <button type="button" class="cockpit-btn cockpit-btn-ghost" id="heroConfirmBtn">
+                        확인 완료
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="cockpit-quickbar">
+              <span class="quickbar-label">상태 체험:</span>
+              <button type="button" class="quick-chip" data-hero-preset="mart">🛒 마트 장보기</button>
+              <button type="button" class="quick-chip" data-hero-preset="cake">🎂 케이크</button>
+              <button type="button" class="quick-chip" data-hero-preset="golf">⛳ 골프백</button>
+              <button type="button" class="quick-chip" id="heroHeatBtn">🔥 실내 28.5℃</button>
+              <button type="button" class="quick-chip" id="heroToggleDoorBtn">🚪 트렁크 개폐</button>
+            </div>
+          </div>
+
+          <p class="cockpit-disclaimer">
+            ⓘ 위 화면은 웹에서 핵심 UX를 가볍게 체험할 수 있도록 모사한 <strong>인터랙티브 프리뷰</strong>입니다.
+            실제 차량용 AAOS 네이티브 앱(Pleos Connect)의 전체 2560×1440 듀얼 모드 UI, 실제 VHAL/SDK 센서 연동,
+            백그라운드 헤드업 알림(HUN) 및 한국어 TTS 음성 제어와는 화면 구성과 동작 범위에 차이가 있습니다.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 2. ORIGIN & DESTINATION GRAPH SCROLLEYTELLING (Base Sticky Tilted Grid Stage) -->
+    <section class="section section-alt od-section" id="transport-core">
+      <div class="container">
+        <div class="od-scrolly-track" id="odScrollyTrack">
+          <div class="od-sticky-stage" id="odStickyStage">
+            <div class="od-sticky-header">
+              <div class="od-sticky-copy">
+                <span class="section-eyebrow">FUNDAMENTAL VEHICLE SERVICE</span>
+                <h2 class="section-title od-sticky-title">사람과 물건의 출발·목적지를 이해하다</h2>
+              </div>
+
+              <!-- Unified App Icon + Status + Live Notification Log Widget (Top-Right) -->
+              <aside class="od-app-hud-panel" id="odAppHudPanel" aria-live="polite" aria-label="앱 실시간 상태 및 알림 로그">
+                <div class="od-hud-header">
+                  <div class="od-hud-app-row">
+                    <div class="od-hud-app-brand">
+                      <img
+                        src="assets/app_icon_final_m3_transparent.png"
+                        alt="What's in My Trunk 앱 아이콘"
+                        class="od-hud-app-icon"
+                      />
+                      <div class="od-hud-app-meta">
+                        <span class="od-hud-app-name">WHAT'S IN MY TRUNK?</span>
+                        <span class="od-hud-app-sub">Pleos Context Care</span>
+                      </div>
+                    </div>
+                    <span class="od-hud-live-pill">
+                      <span class="od-hud-live-dot" aria-hidden="true"></span>
+                      LIVE
+                    </span>
+                  </div>
+
+                  <div class="od-context-hud" id="odContextHud">
+                    <div class="od-ctx-badge od-ctx-route is-active" id="odBadgeRoute">
+                      <div class="od-ctx-top">
+                        <span class="od-ctx-swatch" aria-hidden="true"></span>
+                        <span class="od-ctx-label">차량 경로</span>
+                      </div>
+                      <span class="od-ctx-status" id="odBadgeRouteText">출발 대기</span>
+                    </div>
+                    <div class="od-ctx-badge od-ctx-human" id="odBadgeHuman">
+                      <div class="od-ctx-top">
+                        <span class="od-ctx-swatch" aria-hidden="true"></span>
+                        <span class="od-ctx-label">사용자 이동</span>
+                      </div>
+                      <span class="od-ctx-status" id="odBadgeHumanText">동선 대기</span>
+                    </div>
+                    <div class="od-ctx-badge od-ctx-cargo" id="odBadgeCargo">
+                      <div class="od-ctx-top">
+                        <span class="od-ctx-swatch" aria-hidden="true"></span>
+                        <span class="od-ctx-label">적재 물건</span>
+                      </div>
+                      <span class="od-ctx-status" id="odBadgeCargoText">적재 대기</span>
+                    </div>
+                  </div>
+
+                  <div class="od-od-tracker" id="odOdTracker">
+                    <div class="od-od-row od-od-human" id="odTrackHuman">
+                      <span class="od-od-badge">사람</span>
+                      <span class="od-od-route">
+                        <span class="od-od-origin" id="odHumanOrigin">출발지 대기</span>
+                        <span class="od-od-arrow" aria-hidden="true">→</span>
+                        <span class="od-od-dest" id="odHumanDest">도착지 예측</span>
+                      </span>
+                    </div>
+                    <div class="od-od-row od-od-cargo" id="odTrackCargo">
+                      <span class="od-od-badge">물건</span>
+                      <span class="od-od-route">
+                        <span class="od-od-origin" id="odCargoOrigin">적재지 대기</span>
+                        <span class="od-od-arrow" aria-hidden="true">→</span>
+                        <span class="od-od-dest" id="odCargoDest">하차지 예측</span>
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="od-hud-log">
+                  <div class="od-hud-log-head">
+                    <span class="od-hud-log-title">실시간 알람 로그</span>
+                    <span class="od-hud-log-count" id="odAlertCount">알람 대기 중</span>
+                  </div>
+                  <ul class="od-hud-log-list" id="odAlertLogList"></ul>
+                </div>
+              </aside>
+            </div>
+
+            <div class="od-grid-stage" id="odGridStage" aria-hidden="true">
+              <div class="od-grid-perspective">
+                <div class="od-grid-plane" id="odGridPlane">
+                  <svg
+                    class="od-plane-svg od-map-svg od-layer-base"
+                    id="odStraightMapSvg"
+                    viewBox="0 0 1000 600"
+                    preserveAspectRatio="none"
+                  ></svg>
+                  <svg
+                    class="od-plane-svg od-map-svg od-layer-human"
+                    id="odHumanMapSvg"
+                    viewBox="0 0 1000 600"
+                    preserveAspectRatio="none"
+                  ></svg>
+                  <svg
+                    class="od-plane-svg od-map-svg od-layer-cargo"
+                    id="odCargoMapSvg"
+                    viewBox="0 0 1000 600"
+                    preserveAspectRatio="none"
+                  ></svg>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 4. VISUALIZED 4-LAYER ARCHITECTURE (Scroll-Stacked 3D Layers + Pull-Out Inspector) -->
+    <section class="section section-alt arch-section" id="architecture">
+      <div class="container">
+        <div class="arch-scrolly-track" id="archScrollyTrack">
+          <div class="arch-sticky-stage" id="archStickyStage">
+            <div class="arch-header-bar">
+              <div class="arch-header-copy">
+                <span class="section-eyebrow">4-LAYER CONTEXT ENGINE</span>
+                <h2 class="section-title arch-title">아래층부터 쌓이는 4-Layer 맥락 엔진</h2>
+              </div>
+
+              <div class="arch-controls">
+                <div class="arch-preset-tabs" id="archPresetTabs" role="tablist" aria-label="시나리오 예시 선택">
+                  <button type="button" class="arch-preset-btn is-active" data-scenario="mart">마트 하차</button>
+                  <button type="button" class="arch-preset-btn" data-scenario="waypoint">경유지 차단</button>
+                  <button type="button" class="arch-preset-btn" data-scenario="avp">AVP 홀드</button>
+                </div>
+                <button type="button" class="arch-explode-btn is-active" id="archExplodeBtn" aria-pressed="true">
+                  다시 모으기
+                </button>
+              </div>
+            </div>
+
+            <div class="arch-stage-grid">
+              <!-- Left: Physical Overlapping 3D Stack Dock (Builds L1 -> L4; Click to Pull Out) -->
+              <div class="arch-stack-dock" id="archStackDock">
+                <div class="arch-stack-persp" id="archStackPersp">
+                  <div class="arch-layer-pile" id="archLayerPile">
+                    <button type="button" class="arch-slab arch-slab-l1" data-layer="0">
+                      <span class="slab-num">L1</span>
+                      <span class="slab-name">Signal Collector</span>
+                      <span class="slab-key">신호 수집</span>
+                      <span class="slab-basis basis-o" aria-hidden="true"></span>
+                      <span class="slab-basis basis-u" aria-hidden="true"></span>
+                      <span class="slab-basis basis-v" aria-hidden="true"></span>
+                    </button>
+                    <button type="button" class="arch-slab arch-slab-l2" data-layer="1">
+                      <span class="slab-num">L2</span>
+                      <span class="slab-name">Trip &amp; Context</span>
+                      <span class="slab-key">이동 기억</span>
+                      <span class="slab-basis basis-o" aria-hidden="true"></span>
+                      <span class="slab-basis basis-u" aria-hidden="true"></span>
+                      <span class="slab-basis basis-v" aria-hidden="true"></span>
+                    </button>
+                    <button type="button" class="arch-slab arch-slab-l3" data-layer="2">
+                      <span class="slab-num">L3</span>
+                      <span class="slab-name">Policy &amp; Rules</span>
+                      <span class="slab-key">안전 판단</span>
+                      <span class="slab-basis basis-o" aria-hidden="true"></span>
+                      <span class="slab-basis basis-u" aria-hidden="true"></span>
+                      <span class="slab-basis basis-v" aria-hidden="true"></span>
+                    </button>
+                    <button type="button" class="arch-slab arch-slab-l4" data-layer="3">
+                      <span class="slab-num">L4</span>
+                      <span class="slab-name">Action &amp; Control</span>
+                      <span class="slab-key">안내 · 제어</span>
+                      <span class="slab-basis basis-o" aria-hidden="true"></span>
+                      <span class="slab-basis basis-u" aria-hidden="true"></span>
+                      <span class="slab-basis basis-v" aria-hidden="true"></span>
+                    </button>
+                  </div>
+                  <!-- 전기장 선 시각화 임시 비활성화
+                  <svg class="arch-field-svg" id="archFieldSvg" aria-hidden="true"></svg>
+                  -->
+                </div>
+                <p class="arch-stack-hint" id="archStackHint">
+                  스크롤하여 아래층(L1)부터 적층 · 클릭해 레이어 꺼내기
+                </p>
+              </div>
+
+              <!-- Right: Showcase Card (Enters from Right -> Holds -> Stacks Left; Also Pull-Out Inspector) -->
+              <div class="arch-showcase-dock" id="archShowcaseDock">
+                <div class="arch-showcase-card" id="archShowcaseCard" data-layer="0">
+                  <div class="arch-card-top">
+                    <span class="arch-card-step" id="archCardStep">LAYER 01</span>
+                    <span class="arch-card-module" id="archCardModule">core/signal · PleosSignalProvider</span>
+                  </div>
+                  <h3 class="arch-card-title" id="archCardTitle">차량 신호 수집</h3>
+                  <div class="arch-card-chips" id="archCardChips"></div>
+                  <div class="arch-card-io">
+                    <div class="arch-io-row">
+                      <span class="arch-io-tag">IN</span>
+                      <span class="arch-io-val" id="archCardIn"></span>
+                    </div>
+                    <div class="arch-io-row is-out">
+                      <span class="arch-io-tag">OUT</span>
+                      <span class="arch-io-val" id="archCardOut"></span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 5. HIDDEN FROM TOP NAV: OUR SECRET PLAN (Context Intelligence Burst & Connect) -->
+    <section class="section secret-section" id="secret-plan" data-step="0">
+      <div class="container">
+        <div class="secret-header">
+          <div class="secret-badge-row">
+            <span class="secret-pill">🔒 OUR SECRET PLAN</span>
+            <span class="secret-sub-tag">CONTEXT INTELLIGENCE</span>
+          </div>
+          <h2 class="secret-title">
+            흩어진 맥락을 하나로 잇는<br />
+            <span class="ci-title-reflect" data-text="Context Intelligence">Context Intelligence</span>
+          </h2>
+        </div>
+
+        <div class="ci-universe" id="ciUniverse" data-step="0">
+          <div class="ci-universe-aura" aria-hidden="true"></div>
+          <div class="ci-star-rays" aria-hidden="true">
+            <span class="ci-star-ray ray-h"></span>
+            <span class="ci-star-ray ray-v"></span>
+            <span class="ci-star-ray ray-d1"></span>
+            <span class="ci-star-ray ray-d2"></span>
+          </div>
+          <div class="ci-orbit-ring orbit-1" aria-hidden="true"></div>
+          <div class="ci-orbit-ring orbit-2" aria-hidden="true"></div>
+          <div class="ci-orbit-ring orbit-3" aria-hidden="true"></div>
+
+          <svg class="ci-link-svg" id="ciLinkSvg" aria-hidden="true"></svg>
+          <div class="ci-fx-layer" id="ciFxLayer" aria-hidden="true"></div>
+          <div class="ci-node-layer" id="ciNodeLayer"></div>
+
+          <button type="button" class="ci-core-orb" id="ciCoreOrb" aria-live="polite">
+            <span class="ci-orb-halo" aria-hidden="true"></span>
+            <span class="ci-orb-ring ring-a" aria-hidden="true"></span>
+            <span class="ci-orb-ring ring-b" aria-hidden="true"></span>
+            <span class="ci-orb-content" id="ciOrbContent">
+              <img
+                src="assets/app_icon_final_m3_transparent.png"
+                alt=""
+                class="ci-orb-app-icon"
+              />
+              <span class="ci-orb-kicker" id="ciOrbKicker">STEP 0 / 4 · CORE</span>
+              <strong class="ci-orb-label" id="ciOrbLabel">맥락 터뜨리기</strong>
+              <span class="ci-orb-pips" aria-hidden="true">
+                <span class="ci-pip" data-pip="1"></span>
+                <span class="ci-pip" data-pip="2"></span>
+                <span class="ci-pip" data-pip="3"></span>
+                <span class="ci-pip" data-pip="4"></span>
+              </span>
+            </span>
+          </button>
+        </div>
+
+        <div class="ci-stage-footer">
+          <p class="ci-status-text" id="ciStatusText">
+            아직 연결되지 않은 차량·시간·공간의 단서들이 원 안에 모여 있습니다. 원을 눌러보세요.
+          </p>
+          <button type="button" class="ci-reset-btn" id="ciResetBtn" hidden>
+            ↺ 다시 터뜨리기
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- 6. DESTINATION: Final App Identity & Download -->
+    <section class="section dest-section" id="download">
+      <div class="container">
+        <div class="dest-stage">
+          <div class="dest-glow" aria-hidden="true"></div>
+
+          <div class="dest-header">
+            <div class="contest-pill">
+              <span class="pulse-dot"></span>
+              <span>DESTINATION REACHED · GEAR P</span>
+            </div>
+
+            <div class="dest-identity">
+              <img
+                src="assets/app_icon_final_m3.png"
+                alt="최종 확정 앱 로고 M-3: 미니멀 테일게이트 아치 &amp; 루미너스 큐브"
+                class="dest-icon"
+              />
+            </div>
+
+            <h2 class="section-title dest-title">
+              당신의 모든 여정이<br />
+              <span class="text-gradient">완벽하게 마무리되도록</span>
+            </h2>
+          </div>
+
+          <div class="dest-cta-row">
+            <a
+              href="https://github.com/Haackaathoon-Hub/What-s-in-my-trunk/releases"
+              target="_blank" rel="noopener noreferrer"
+              class="btn btn-primary btn-lg"
+              id="downloadApkBtn"
+            >
+              ⬇ Release APK 다운로드 (~163MB)
+            </a>
+            <button type="button" class="btn btn-secondary btn-lg" id="openPreExitModalBtn">
+              🔔 하차 알림 · 산출물 팝업 열기
+            </button>
+            <a href="#top" class="btn btn-secondary btn-lg">
+              ↑ 출발지(맨 위)로 돌아가기
+            </a>
+          </div>
+
+          <div class="hero-metrics dest-metrics">
+            <div class="metric-item">
+              <span class="metric-val">Team Players</span>
+              <span class="metric-lbl">현대자동차그룹 Pleos Connect 앱 개발팀</span>
+            </div>
+            <div class="metric-divider"></div>
+            <div class="metric-item">
+              <span class="metric-val">Pleos Native</span>
+              <span class="metric-lbl">SDK 2.3.2 · NaviHelper 2.0.3 · AAOS VHAL</span>
+            </div>
+            <div class="metric-divider"></div>
+            <div class="metric-item">
+              <span class="metric-val">Source Code</span>
+              <span class="metric-lbl">
+                <a href="https://github.com/Haackaathoon-Hub/What-s-in-my-trunk" target="_blank" rel="noopener noreferrer">GitHub 저장소 ↗</a>
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- 6-B. Pre-Exit Arrival Overlay Popup (Mirrors PreExitOverlayContent.kt) -->
+  <div
+    class="pre-exit-modal"
+    id="preExitModal"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="preExitHeadline"
+    hidden
+  >
+    <div class="pre-exit-backdrop" id="preExitBackdrop"></div>
+    <article class="pre-exit-card" aria-label="하차 전 트렁크 미수거 물품 및 산출물 알림 팝업">
+      <!-- 1. 상단 1줄: 목적지 도착 P단 경고 배지 + 영상 전환 세그먼트 + 닫기 -->
+      <header class="pre-exit-top">
+        <div class="pre-exit-status">
+          <span class="pre-exit-badge is-warning">⚠ 목적지 도착 · P단 주차</span>
+          <span class="pre-exit-brand">WHAT'S IN MY TRUNK?</span>
+        </div>
+
+        <div class="pre-exit-top-right">
+          <div class="pre-exit-media-tabs" role="tablist" aria-label="영상 전환">
+            <button
+              type="button"
+              class="pre-exit-tab is-active"
+              data-media-tab="demo"
+              id="preExitDemoTab"
+              role="tab"
+              aria-selected="true"
+            >
+              🎬 시연 영상
+            </button>
+            <button
+              type="button"
+              class="pre-exit-tab"
+              data-media-tab="shorts"
+              id="preExitShortsTab"
+              role="tab"
+              aria-selected="false"
+            >
+              📱 쇼츠
+            </button>
+          </div>
+          <button type="button" class="pre-exit-dismiss" id="preExitCloseBtn" aria-label="팝업 닫기">
+            ✕
+          </button>
+        </div>
+      </header>
+
+      <!-- 2. 앱 하차 알림 헤드라인 & 챙겨갈 물품 안내 (PreExitOverlayContent.kt 연동 톤) -->
+      <div class="pre-exit-arrival-copy">
+        <h3 class="pre-exit-headline" id="preExitHeadline">
+          트렁크 짐을 잊지 말고 챙겨가세요
+        </h3>
+        <p class="pre-exit-sub">
+          내리기 전 트렁크에 실어둔 <strong>Release APK · GitHub 소스 · 시연 영상</strong>을 함께 확인하세요.
+        </p>
+      </div>
+
+      <!-- 3. 중앙 시네마 프레임 -->
+      <div class="pre-exit-cinema">
+        <a
+          href="#"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="pre-exit-media-ext"
+          id="preExitMediaExtLink"
+          hidden
+        >
+          새 탭에서 보기 ↗
+        </a>
+        <div class="pre-exit-video-stage" id="preExitVideoStage">
+          <!-- Populated dynamically from PRE_EXIT_POPUP_CONFIG in app.js -->
+        </div>
+      </div>
+
+      <!-- 4. 1줄 프로젝트 크레딧 바 -->
+      <div class="pre-exit-credit-bar">
+        <div class="pre-exit-team-line">
+          <strong id="preExitTeamName">Team Players</strong>
+        </div>
+        <span class="pre-exit-mode-tag">하차 직전 미수거 알림 · PreExitOverlay</span>
+      </div>
+
+      <!-- 5. 하단 HMI 액션 바 -->
+      <footer class="pre-exit-actions">
+        <a
+          href="https://github.com/Haackaathoon-Hub/What-s-in-my-trunk/releases"
+          target="_blank" rel="noopener noreferrer"
+          class="pre-exit-btn pre-exit-btn-primary"
+          id="preExitModalApkBtn"
+        >
+          🔓 트렁크 열기 · APK 챙기기
+        </a>
+        <a
+          href="https://github.com/Haackaathoon-Hub/What-s-in-my-trunk"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="pre-exit-btn pre-exit-btn-secondary"
+          id="preExitModalGithubBtn"
+        >
+          🐙 GitHub 소스 챙기기 ↗
+        </a>
+        <button type="button" class="pre-exit-btn pre-exit-btn-ghost" id="preExitAckBtn">
+          ✓ 다 챙겼어요
+        </button>
+      </footer>
+    </article>
+  </div>
+
+  <!-- Footer -->
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-surface">
+        <div class="footer-brand">
+          <img src="assets/app_icon_final_m3_transparent.png" alt="" class="footer-logo" />
+          <div class="footer-brand-copy">
+            <strong>WHAT'S IN MY TRUNK? · Team Players</strong>
+            <span>현대자동차그룹 Pleos Connect 차량용 앱 개발 공모전 출품작</span>
+          </div>
+        </div>
+
+        <div class="footer-meta-row">
+          <div class="footer-craft-pill">
+            <span class="pulse-dot"></span>
+            <span>이 웹페이지는 <strong>Google Antigravity</strong> · <strong>Google Gemini</strong>를 활용하여 생성되었습니다.</span>
+          </div>
+          <div class="footer-links">
+            <a href="https://github.com/Haackaathoon-Hub/What-s-in-my-trunk" target="_blank" rel="noopener noreferrer">GitHub ↗</a>
+            <a href="https://github.com/Haackaathoon-Hub/What-s-in-my-trunk/blob/main/README.md" target="_blank" rel="noopener noreferrer">README.md</a>
+            <a href="#top">맨 위로 ↑</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>
