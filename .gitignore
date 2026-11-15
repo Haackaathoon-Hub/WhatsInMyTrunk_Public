@@ -1,0 +1,22 @@
+*.pptx
+
+# Android / Gradle
+.gradle/
+build/
+*/build/
+local.properties
+*.iml
+.idea/
+*.apk
+*.aab
+captures/
+.externalNativeBuild/
+.cxx/
+
+# Internal / Unrelated tooling & drafts
+/docs/
+scripts/
+.agents/
+run_agent_loop.ps1
+TEST_INFRA.md
+TEST_READY.md

@@ -1,0 +1,8 @@
+Vosk Android 0.3.75 and the vosk-model-small-ko-0.22 model are distributed under the Apache License 2.0.
+Vosk Android is provided by Alpha Cephei Inc. The model is listed at https://alphacephei.com/vosk/models.
+
+The Korean voice clips were synthesized using Supertonic 3 by Supertone Inc.
+Model revision: 724fb5abbf5502583fb520898d45929e62f02c0b. Voice style: F1. Language: ko.
+Model page: https://huggingface.co/Supertone/supertonic-3
+Model license: OpenRAIL-M. See LICENSE-SUPERTONIC.txt for terms.
+The app includes the generated audio clips.

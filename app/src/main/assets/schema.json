@@ -1,0 +1,112 @@
+{
+  "packageName": "com.pleos.vehiclecontext",
+  "appDescription": "Record cargo loaded into the trunk and remind the driver where to unload it. The app confirms changes before saving and can use the active navigation destination.",
+  "invokeWord": "트렁크",
+  "version": "1.3.0",
+  "actionCalls": [
+    {
+      "type": "function",
+      "function": {
+        "name": "REGISTER_TRUNK_CARGO",
+        "description": "Prepare one newly loaded trunk item for driver confirmation from its name and spoken quantity. The intended use, unloading place, and long-term storage preference are optional.",
+        "component": "service",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "cargo_name": {
+              "type": "string",
+              "description": "The name of the item loaded into the trunk."
+            },
+            "quantity": {
+              "type": "number",
+              "description": "The spoken count of items expressed as a whole number from 1 to 999."
+            },
+            "purpose": {
+              "type": "string",
+              "description": "The intended use if the driver explicitly provides one."
+            },
+            "target_place": {
+              "type": "string",
+              "description": "The unloading place if the driver explicitly specifies it. The app can use the active navigation destination when omitted."
+            },
+            "keep_in_car": {
+              "type": "boolean",
+              "description": "Whether the cargo should remain in the car without destination reminders."
+            }
+          },
+          "required": [
+            "cargo_name",
+            "quantity"
+          ]
+        }
+      }
+    },
+    {
+      "type": "function",
+      "function": {
+        "name": "LIST_TRUNK_CARGO",
+        "description": "Report cargo recorded as remaining in the trunk. Optionally filter by item name or saved unloading destination.",
+        "component": "service",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "query": {
+              "type": "string",
+              "description": "The cargo name to search for, or an empty string to list all remaining cargo."
+            },
+            "target_place": {
+              "type": "string",
+              "description": "An optional unloading destination to match against the saved destination."
+            }
+          },
+          "required": []
+        }
+      }
+    },
+    {
+      "type": "function",
+      "function": {
+        "name": "UPDATE_TRUNK_CARGO",
+        "description": "Prepare a cargo update for driver confirmation: record unloading, change the unloading destination, or keep the cargo in the car without arrival reminders.",
+        "component": "service",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "cargo_name": {
+              "type": "string",
+              "description": "The name of the cargo item."
+            },
+            "quantity": {
+              "type": "number",
+              "description": "The whole number actually unloaded. Supply this only for the unload operation."
+            },
+            "cargo_id": {
+              "type": "string",
+              "description": "The identifier of a specific cargo record when multiple records have the same name."
+            },
+            "operation": {
+              "type": "string",
+              "enum": [
+                "unload",
+                "change_destination",
+                "keep_in_car"
+              ],
+              "description": "Use unload for removed cargo, change_destination for a new unloading destination, or keep_in_car for permanent storage."
+            },
+            "existing_target_place": {
+              "type": "string",
+              "description": "The old unloading destination, useful to distinguish records with the same cargo name."
+            },
+            "target_place": {
+              "type": "string",
+              "description": "The new unloading destination. Supply this only for the change_destination operation."
+            }
+          },
+          "required": [
+            "operation"
+          ]
+        }
+      }
+    }
+  ]
+}
