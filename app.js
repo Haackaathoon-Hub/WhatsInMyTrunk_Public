@@ -9,7 +9,9 @@
   const PRE_EXIT_POPUP_CONFIG = {
     teamName: 'Players',
     githubUrl: 'https://github.com/Haackaathoon-Hub/WhatsInMyTrunk_Public',
-    demoVideoUrl: '',
+    demoVideoUrl: 'https://youtu.be/9ibNaVEvJb4',
+    cardNews1Url: 'https://youtu.be/Ee-gYc9_pIw',
+    cardNews2Url: 'https://youtu.be/uv1dv7sx3kk',
     youtubeShortsUrl: 'https://youtube.com/shorts/AY4PW7mkSdg',
     apkUrl: 'https://github.com/Haackaathoon-Hub/WhatsInMyTrunk_Public/releases/tag/v1.0.0'
   };
@@ -2676,8 +2678,7 @@
   const openPreExitModalBtn = document.getElementById('openPreExitModalBtn');
   const preExitCloseBtn = document.getElementById('preExitCloseBtn');
   const preExitAckBtn = document.getElementById('preExitAckBtn');
-  const preExitDemoTab = document.getElementById('preExitDemoTab');
-  const preExitShortsTab = document.getElementById('preExitShortsTab');
+  const preExitMediaTabs = Array.from(document.querySelectorAll('.pre-exit-tab[data-media-tab]'));
   const preExitVideoStage = document.getElementById('preExitVideoStage');
   const preExitMediaExtLink = document.getElementById('preExitMediaExtLink');
   const preExitTeamName = document.getElementById('preExitTeamName');
@@ -2719,21 +2720,42 @@
     return { kind: 'iframe', embedUrl: trimmed, openUrl: trimmed };
   }
 
+  const PRE_EXIT_MEDIA_TABS = {
+    demo: {
+      configKey: 'demoVideoUrl',
+      title: 'Pleos Connect Demo Video Player',
+      emptyLabel: '트렁크 속 Pleos Connect 시연 영상 대기 중'
+    },
+    card1: {
+      configKey: 'cardNews1Url',
+      title: 'Card News Video 1 Player',
+      emptyLabel: '트렁크 속 카드뉴스 영상 1 대기 중'
+    },
+    card2: {
+      configKey: 'cardNews2Url',
+      title: 'Card News Video 2 Player',
+      emptyLabel: '트렁크 속 카드뉴스 영상 2 대기 중'
+    },
+    shorts: {
+      configKey: 'youtubeShortsUrl',
+      title: 'YouTube Shorts Player',
+      emptyLabel: '트렁크 속 YouTube 쇼츠 대기 중'
+    }
+  };
+
   function renderPreExitMedia(tabKey) {
-    activePreExitMediaTab = tabKey === 'shorts' ? 'shorts' : 'demo';
+    activePreExitMediaTab = Object.prototype.hasOwnProperty.call(PRE_EXIT_MEDIA_TABS, tabKey) ? tabKey : 'demo';
+    const meta = PRE_EXIT_MEDIA_TABS[activePreExitMediaTab];
     const isShorts = activePreExitMediaTab === 'shorts';
 
-    if (preExitDemoTab) {
-      preExitDemoTab.classList.toggle('is-active', !isShorts);
-      preExitDemoTab.setAttribute('aria-selected', String(!isShorts));
-    }
-    if (preExitShortsTab) {
-      preExitShortsTab.classList.toggle('is-active', isShorts);
-      preExitShortsTab.setAttribute('aria-selected', String(isShorts));
-    }
+    preExitMediaTabs.forEach((btn) => {
+      const selected = btn.getAttribute('data-media-tab') === activePreExitMediaTab;
+      btn.classList.toggle('is-active', selected);
+      btn.setAttribute('aria-selected', String(selected));
+    });
 
     if (!preExitVideoStage) return;
-    const rawUrl = isShorts ? PRE_EXIT_POPUP_CONFIG.youtubeShortsUrl : PRE_EXIT_POPUP_CONFIG.demoVideoUrl;
+    const rawUrl = PRE_EXIT_POPUP_CONFIG[meta.configKey] || '';
     const parsed = parseMediaUrl(rawUrl);
 
     preExitVideoStage.classList.toggle('is-shorts', isShorts);
@@ -2744,11 +2766,10 @@
       if (preExitMediaExtLink) preExitMediaExtLink.hidden = true;
       const box = document.createElement('div');
       box.className = 'pre-exit-media-placeholder';
-      const fieldName = isShorts ? 'youtubeShortsUrl' : 'demoVideoUrl';
       box.innerHTML = `
         <span class="pre-exit-play-orb" aria-hidden="true">▶</span>
-        <strong>${isShorts ? '트렁크 속 YouTube 쇼츠 대기 중' : '트렁크 속 시연 영상 대기 중'}</strong>
-        <span><code>PRE_EXIT_POPUP_CONFIG.${fieldName}</code>에 링크를 넣으면 바로 재생됩니다</span>
+        <strong>${meta.emptyLabel}</strong>
+        <span><code>PRE_EXIT_POPUP_CONFIG.${meta.configKey}</code>에 링크를 넣으면 바로 재생됩니다</span>
       `;
       preExitVideoStage.appendChild(box);
       return;
@@ -2770,7 +2791,7 @@
 
     const iframe = document.createElement('iframe');
     iframe.src = parsed.embedUrl;
-    iframe.title = isShorts ? 'YouTube Shorts Player' : 'Demo Video Player';
+    iframe.title = meta.title;
     iframe.allow = 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share';
     iframe.allowFullscreen = true;
     iframe.loading = 'lazy';
@@ -2820,12 +2841,9 @@
     if (preExitBackdrop) {
       preExitBackdrop.addEventListener('click', closePreExitModal);
     }
-    if (preExitDemoTab) {
-      preExitDemoTab.addEventListener('click', () => renderPreExitMedia('demo'));
-    }
-    if (preExitShortsTab) {
-      preExitShortsTab.addEventListener('click', () => renderPreExitMedia('shorts'));
-    }
+    preExitMediaTabs.forEach((btn) => {
+      btn.addEventListener('click', () => renderPreExitMedia(btn.getAttribute('data-media-tab')));
+    });
 
     document.addEventListener('keydown', (e) => {
       if (e.key === 'Escape' && !preExitModal.hidden) {

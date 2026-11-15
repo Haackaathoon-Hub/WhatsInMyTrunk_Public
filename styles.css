@@ -3453,8 +3453,10 @@ html[data-theme="light"] .pre-exit-badge.is-warning {
 
 .pre-exit-media-tabs {
   display: inline-flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
   padding: 3px;
-  border-radius: 999px;
+  border-radius: 16px;
   border: 1px solid var(--border);
   background: var(--surface-2);
   gap: 2px;
@@ -3469,6 +3471,7 @@ html[data-theme="light"] .pre-exit-badge.is-warning {
   font-family: var(--font-sans);
   font-size: 0.78rem;
   font-weight: 700;
+  white-space: nowrap;
   cursor: pointer;
   transition: background-color 0.16s ease, color 0.16s ease;
 }
