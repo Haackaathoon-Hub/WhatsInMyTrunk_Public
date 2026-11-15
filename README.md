@@ -9,13 +9,14 @@
 * **앱 이름:** **WHAT'S IN MY TRUNK?** *(Pleos Vehicle Context Intelligence)*
 * **한 줄 소개:** 사용자의 번거로운 수동 입력 없이 차량 센서(트렁크·도어·기어·시트·창문·공조)와 내비게이션 이동 맥락(목적지·경로·POI)을 결합해, **하차 직전 트렁크·뒷좌석 소지품 방치와 신선식품 변질을 선제적으로 예방하고 원터치 차량 제어까지 수행하는 차량 네이티브 컨텍스트 인텔리전스 앱**입니다.
 
-### 주요 링크 (업로드 후 최종 URL 반영)
+### 주요 링크
 | 항목 | 링크 / 위치 | 비고 |
 |---|---|---|
-| **Release APK (GitHub Releases)** | `https://github.com/Haackaathoon-Hub/What-s-in-my-trunk/releases` | 최종 저장소 Release 등록 후 직링크로 교체 |
-| **웹 인터랙티브 데모 (GitHub Pages)** | *(배포 URL 입력 예정)* | `gh-pages` 브랜치 기반 소개 페이지 |
+| **GitHub Repository** | https://github.com/Haackaathoon-Hub/WhatsInMyTrunk_Public | 공개 저장소 (`main` · `gh-pages`) |
+| **Release APK (GitHub Releases)** | https://github.com/Haackaathoon-Hub/WhatsInMyTrunk_Public/releases/tag/v1.0.0 | `Players_WhatsInMyTrunk_release.apk` (`v1.0.0`) |
+| **웹 인터랙티브 데모 (GitHub Pages)** | https://haackaathoon-hub.github.io/WhatsInMyTrunk_Public/ | `gh-pages` 브랜치 기반 소개 페이지 |
 | **시연 영상 (Demo Video)** | *(시연 영상 URL 입력 예정)* | 에뮬레이터 실구동 시연 영상 |
-| **숏폼 영상 (선택)** | *(숏폼 URL 입력 예정)* | `#HMG차량용앱개발공모전` |
+| **숏폼 영상 (YouTube Shorts)** | https://youtube.com/shorts/AY4PW7mkSdg | `#HMG차량용앱개발공모전` |
 
 ---
 
@@ -54,7 +55,7 @@
 
 ## 3. APK 파일 위치 및 GitHub Release 안내
 
-* **제출용 Release APK 파일명:** `apk/Players_WhatsInMyTrunk_release.apk` (약 163 MB)
+* **제출용 Release APK 파일명:** `apk/Players_WhatsInMyTrunk_release.apk` (약 149 MB)
 * **배포 방식 (GitHub Releases):**
   * 오프라인 한국어 음성 인식 모델(`vosk-ko-0.22.zip`, 약 80.8 MB) 및 ABI별 네이티브 라이브러리 포함으로 인해 단일 APK 용량이 GitHub 일반 Git 업로드 제한(100 MB)을 초과합니다.
   * 공모전 공식 가이드(*용량 초과 시 GitHub Releases 등록*)에 따라 **GitHub Releases**에 `Players_WhatsInMyTrunk_release.apk`를 업로드하고, 상단 링크 표에 Release 주소를 연결합니다.

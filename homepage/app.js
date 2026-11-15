@@ -8,10 +8,10 @@
      ======================================================================== */
   const PRE_EXIT_POPUP_CONFIG = {
     teamName: 'Players',
-    githubUrl: 'https://github.com/Haackaathoon-Hub/What-s-in-my-trunk',
+    githubUrl: 'https://github.com/Haackaathoon-Hub/WhatsInMyTrunk_Public',
     demoVideoUrl: '',
-    youtubeShortsUrl: '',
-    apkUrl: '../apk/Players_WhatsInMyTrunk_release.apk'
+    youtubeShortsUrl: 'https://youtube.com/shorts/AY4PW7mkSdg',
+    apkUrl: 'https://github.com/Haackaathoon-Hub/WhatsInMyTrunk_Public/releases/tag/v1.0.0'
   };
 
   /* ========================================================================
