@@ -15,7 +15,9 @@
 | **GitHub Repository** | https://github.com/Haackaathoon-Hub/WhatsInMyTrunk_Public | 공개 저장소 (`main` · `gh-pages`) |
 | **Release APK (GitHub Releases)** | https://github.com/Haackaathoon-Hub/WhatsInMyTrunk_Public/releases/tag/v1.0.0 | `Players_WhatsInMyTrunk_release.apk` (`v1.0.0`) |
 | **웹 인터랙티브 데모 (GitHub Pages)** | https://haackaathoon-hub.github.io/WhatsInMyTrunk_Public/ | `gh-pages` 브랜치 기반 소개 페이지 |
-| **시연 영상 (Demo Video)** | *(시연 영상 URL 입력 예정)* | 에뮬레이터 실구동 시연 영상 |
+| **시연 영상 (Pleos Connect 실구동)** | https://youtu.be/9ibNaVEvJb4 | Pleos Connect 에뮬레이터 실구동 시연 영상 |
+| **시연 영상 1 (카드뉴스 소개)** | https://youtu.be/Ee-gYc9_pIw | 이미지 소스 기반 카드뉴스 영상 1 |
+| **시연 영상 2 (카드뉴스 심화)** | https://youtu.be/uv1dv7sx3kk | 이미지 소스 기반 카드뉴스 영상 2 |
 | **숏폼 영상 (YouTube Shorts)** | https://youtube.com/shorts/AY4PW7mkSdg | `#HMG차량용앱개발공모전` |
 
 ---
@@ -45,11 +47,15 @@
 |:---:|:---:|
 | ![목적지 도착 P단 하차 알림 팝업](homepage/assets/Screenshot_20261115_200336.png) | ![트렁크 적재 감지 닫힘 팝업](homepage/assets/Screenshot_20261115_200402.png) |
 
-### 시연 GIF · 동영상 *(추가 촬영 후 주석 해제하여 반영)*
-> GIF 파일은 `homepage/assets/` 경로에 배치하고, 동영상(`.mp4`)은 GitHub 이슈/코멘트 업로드 URL을 붙여넣습니다.
->
-> * **핵심 플로우 GIF (예정):** `<!-- ![하차 전 알림 E2E 시연](homepage/assets/demo_e2e_flow.gif) -->`
-> * **시연 영상 임베드 (예정):** *(새 GitHub 저장소 이슈/코멘트에 `.mp4` 업로드 후 생성되는 URL 붙여넣기)*
+### 시연 영상 (YouTube) · GIF
+
+| Pleos Connect 실구동 시연 | 카드뉴스 시연 영상 1 | 카드뉴스 시연 영상 2 |
+|:---:|:---:|:---:|
+| [![Pleos Connect 실구동 시연](https://img.youtube.com/vi/9ibNaVEvJb4/hqdefault.jpg)](https://youtu.be/9ibNaVEvJb4) | [![카드뉴스 시연 영상 1](https://img.youtube.com/vi/Ee-gYc9_pIw/hqdefault.jpg)](https://youtu.be/Ee-gYc9_pIw) | [![카드뉴스 시연 영상 2](https://img.youtube.com/vi/uv1dv7sx3kk/hqdefault.jpg)](https://youtu.be/uv1dv7sx3kk) |
+| [실구동 시연 보기 ↗](https://youtu.be/9ibNaVEvJb4) | [카드뉴스 1 보기 ↗](https://youtu.be/Ee-gYc9_pIw) | [카드뉴스 2 보기 ↗](https://youtu.be/uv1dv7sx3kk) |
+
+* **YouTube Shorts:** [https://youtube.com/shorts/AY4PW7mkSdg](https://youtube.com/shorts/AY4PW7mkSdg)
+* *(선택)* **핵심 플로우 GIF (예정):** `<!-- ![하차 전 알림 E2E 시연](homepage/assets/demo_e2e_flow.gif) -->`
 
 ---
 
